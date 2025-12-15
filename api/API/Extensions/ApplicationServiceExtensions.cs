@@ -21,9 +21,20 @@ public static class ApplicationServiceExtensions
         services.AddSwaggerGen();
 
         // Database - PostgreSQL for production
+        var connectionString = config.GetConnectionString("DefaultConnection");
+        
+        // Handle Railway's PostgreSQL URL format and add SSL
+        if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgresql://"))
+        {
+            // Convert URL format to Npgsql format
+            var uri = new Uri(connectionString);
+            var userInfo = uri.UserInfo.Split(':');
+            connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+        }
+        
         services.AddDbContext<DataContext>(opt =>
         {
-            opt.UseNpgsql(config.GetConnectionString("DefaultConnection"));
+            opt.UseNpgsql(connectionString);
         });
 
         // CORS - Allow Astro frontend (local and production)
