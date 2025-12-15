@@ -1,5 +1,5 @@
 [build]
 builder = "dockerfile"
-dockerfilePath = "api/Dockerfile"
+dockerfilePath = "Dockerfile"
 watchPatterns = ["api/**"]
 

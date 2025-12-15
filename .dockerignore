@@ -1,0 +1,28 @@
+# Ignore build outputs
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+# Ignore node_modules
+**/node_modules/
+**/dist/
+
+# Ignore IDE files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Ignore git
+.git/
+
+# Ignore databases
+*.db
+*.db-journal
+
+# Ignore non-api folders for faster build
+blog/
+studio-blog/
+
