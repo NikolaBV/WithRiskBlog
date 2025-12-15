@@ -1,8 +1,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Copy all project files
-COPY . .
+# Copy all project files from api folder
+COPY api/ .
 
 # Restore and publish
 RUN dotnet restore Blog.sln
