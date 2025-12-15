@@ -17,7 +17,9 @@ nextjs-blog/VERCEL_DEPLOYMENT.md
 *.db
 *.db-journal
 *.db-shm
-*.db-wal
+*.db-wal 
+
+
 
 # Environment files
 .env
