@@ -1,6 +1,13 @@
+# Ignore build outputs
 **/bin/
 **/obj/
-**/*.db
-**/*.user
-.git/
+**/out/
+**/publish/
 
+# Ignore databases
+*.db
+*.db-journal
+
+# Ignore IDE files
+.vs/
+*.user
