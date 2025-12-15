@@ -10,14 +10,26 @@ builder.Services.AddApplicationServices(builder.Configuration);
 
 var app = builder.Build();
 
+// Global exception handler - must be first to catch all errors
+app.UseExceptionHandler(appError =>
+{
+    appError.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync("{\"error\": \"An internal server error occurred\"}");
+    });
+});
+
+// CORS must come before other middleware
+app.UseCors("CorsPolicy");
+
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseCors("CorsPolicy");
 
 // Note: Add authentication middleware here when you implement auth
 // app.UseAuthentication();
