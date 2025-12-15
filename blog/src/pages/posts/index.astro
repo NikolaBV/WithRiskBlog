@@ -1,0 +1,94 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PostCard from '@components/PostCard.astro';
+import { sanityClient, queries, type SanityPost } from '@lib/sanity';
+
+// Fetch all posts at build time
+const allPosts = await sanityClient.fetch<SanityPost[]>(queries.allPosts);
+// Filter out posts without valid slugs
+const posts = (allPosts || []).filter(post => post?.slug?.current);
+---
+
+<BaseLayout title="All Posts - With Risk" description="Browse all our articles and insights">
+  <section class="posts-page">
+    <header class="page-header">
+      <h1>All Posts</h1>
+      <p>Explore our collection of articles, insights, and stories.</p>
+    </header>
+
+    <div class="posts-grid">
+      {posts.map((post) => (
+        <PostCard post={post} />
+      ))}
+    </div>
+
+    {posts.length === 0 && (
+      <div class="empty-state">
+        <h2>No posts yet</h2>
+        <p>Create your first post in Sanity Studio to see it here!</p>
+      </div>
+    )}
+  </section>
+</BaseLayout>
+
+<style>
+  .posts-page {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .page-header h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .page-header p {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 6rem 2rem;
+    background: var(--color-bg-secondary);
+    border-radius: 16px;
+    border: 1px dashed var(--color-border);
+  }
+
+  .empty-state h2 {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state p {
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 640px) {
+    .posts-page {
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    .posts-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+

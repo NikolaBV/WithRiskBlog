@@ -1,0 +1,190 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About - With Risk" description="Learn more about With Risk and our mission">
+  <section class="about-page">
+    <header class="page-header">
+      <h1>About <span class="accent">With Risk</span></h1>
+      <p class="subtitle">The story behind our platform</p>
+    </header>
+
+    <div class="content">
+      <div class="intro">
+        <p>
+          With Risk is a platform dedicated to sharing insights, stories, and knowledge 
+          that matters. We believe in taking calculated risks and learning from every experience.
+        </p>
+      </div>
+
+      <div class="values">
+        <h2>Our Values</h2>
+        <div class="values-grid">
+          <div class="value-card">
+            <div class="value-icon">🎯</div>
+            <h3>Authenticity</h3>
+            <p>We share real experiences and genuine insights, not polished perfection.</p>
+          </div>
+          <div class="value-card">
+            <div class="value-icon">💡</div>
+            <h3>Curiosity</h3>
+            <p>We explore new ideas and aren't afraid to question conventional wisdom.</p>
+          </div>
+          <div class="value-card">
+            <div class="value-icon">🚀</div>
+            <h3>Growth</h3>
+            <p>Every story we share is an opportunity to learn and grow together.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-section">
+        <h2>Want to contribute?</h2>
+        <p>We're always looking for new voices and perspectives. Get in touch!</p>
+        <a href="mailto:hello@withrisk.com" class="cta-button">Contact Us</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about-page {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .page-header h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .accent {
+    color: var(--color-accent);
+  }
+
+  .subtitle {
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+  }
+
+  .content {
+    max-width: var(--content-width);
+    margin: 0 auto;
+  }
+
+  .intro {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    margin-bottom: 4rem;
+    padding: 2rem;
+    background: var(--color-bg-secondary);
+    border-radius: 12px;
+    border-left: 4px solid var(--color-accent);
+  }
+
+  .values {
+    margin-bottom: 4rem;
+  }
+
+  .values h2 {
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .value-card {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .value-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-accent);
+  }
+
+  .value-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .value-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .value-card p {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .cta-section {
+    text-align: center;
+    padding: 3rem;
+    background: linear-gradient(135deg, var(--color-bg-secondary) 0%, rgba(249, 115, 22, 0.1) 100%);
+    border-radius: 16px;
+    border: 1px solid var(--color-border);
+  }
+
+  .cta-section h2 {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .cta-section p {
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    background: var(--color-accent);
+    color: white;
+    padding: 0.875rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .cta-button:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 640px) {
+    .about-page {
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    .intro {
+      padding: 1.5rem;
+      font-size: 1.1rem;
+    }
+  }
+</style>
+
+

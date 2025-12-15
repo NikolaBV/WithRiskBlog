@@ -1,0 +1,323 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { sanityClient, queries, urlFor, type SanityPost } from '@lib/sanity';
+import CommentSection from '@components/CommentSection';
+import LikeButton from '@components/LikeButton';
+
+// Generate static paths at build time - this is KEY for SEO!
+export async function getStaticPaths() {
+  const slugs = await sanityClient.fetch<string[]>(queries.allPostSlugs);
+  
+  // Filter out null/undefined slugs
+  return (slugs || [])
+    .filter(slug => slug)
+    .map((slug) => ({
+      params: { slug },
+    }));
+}
+
+const { slug } = Astro.params;
+
+// Fetch the post data
+const post = await sanityClient.fetch<SanityPost>(queries.postBySlug, { slug });
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+const imageUrl = post.mainImage 
+  ? urlFor(post.mainImage).width(1200).height(630).url() 
+  : undefined;
+
+const formattedDate = post.publishedAt 
+  ? new Date(post.publishedAt).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  : null;
+
+// Simple portable text to HTML (for more complex needs, use @portabletext/react)
+function portableTextToHtml(blocks: any[]): string {
+  if (!blocks) return '';
+  
+  return blocks.map(block => {
+    if (block._type === 'block') {
+      const text = block.children?.map((child: any) => {
+        let content = child.text || '';
+        if (child.marks?.includes('strong')) content = `<strong>${content}</strong>`;
+        if (child.marks?.includes('em')) content = `<em>${content}</em>`;
+        if (child.marks?.includes('code')) content = `<code>${content}</code>`;
+        return content;
+      }).join('') || '';
+      
+      switch (block.style) {
+        case 'h1': return `<h1>${text}</h1>`;
+        case 'h2': return `<h2>${text}</h2>`;
+        case 'h3': return `<h3>${text}</h3>`;
+        case 'h4': return `<h4>${text}</h4>`;
+        case 'blockquote': return `<blockquote>${text}</blockquote>`;
+        default: return `<p>${text}</p>`;
+      }
+    }
+    return '';
+  }).join('');
+}
+
+const bodyHtml = portableTextToHtml(post.body || []);
+---
+
+<BaseLayout 
+  title={`${post.title} - With Risk`}
+  description={post.excerpt || `Read ${post.title} on With Risk`}
+  image={imageUrl}
+>
+  <article class="post">
+    <header class="post-header">
+      {post.categories && post.categories.length > 0 && (
+        <div class="categories">
+          {post.categories.map((cat) => (
+            <span class="category">{cat.title}</span>
+          ))}
+        </div>
+      )}
+      
+      <h1 class="post-title">{post.title}</h1>
+      
+      <div class="post-meta">
+        {post.author && (
+          <div class="author">
+            {post.author.image && (
+              <img 
+                src={urlFor(post.author.image).width(48).height(48).url()} 
+                alt={post.author.name}
+                class="author-image"
+              />
+            )}
+            <span class="author-name">{post.author.name}</span>
+          </div>
+        )}
+        
+        {formattedDate && (
+          <time datetime={post.publishedAt}>{formattedDate}</time>
+        )}
+      </div>
+    </header>
+
+    {imageUrl && (
+      <figure class="post-image">
+        <img src={imageUrl} alt={post.title} />
+      </figure>
+    )}
+
+    <div class="post-content" set:html={bodyHtml} />
+
+    <footer class="post-footer">
+      <!-- React component for interactivity - hydrates on client -->
+      <LikeButton client:visible postSlug={slug!} />
+      
+      <div class="share-section">
+        <span>Share this post:</span>
+        <a 
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${Astro.url}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="share-link"
+        >
+          Twitter
+        </a>
+      </div>
+    </footer>
+  </article>
+
+  <!-- Comments section - React component with client-side hydration -->
+  <section class="comments-section">
+    <h2>Comments</h2>
+    <CommentSection client:visible postSlug={slug!} />
+  </section>
+</BaseLayout>
+
+<style>
+  .post {
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: 4rem 2rem;
+  }
+
+  .post-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .categories {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .category {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-accent);
+    background: rgba(249, 115, 22, 0.1);
+    padding: 0.375rem 1rem;
+    border-radius: 4px;
+  }
+
+  .post-title {
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
+  .author {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .author-image {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .author-name {
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .post-image {
+    margin: 0 -2rem 3rem;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .post-image img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .post-content {
+    font-size: 1.125rem;
+    line-height: 1.8;
+  }
+
+  .post-content :global(h2) {
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 2.5rem 0 1rem;
+  }
+
+  .post-content :global(h3) {
+    font-family: var(--font-serif);
+    font-size: 1.375rem;
+    font-weight: 600;
+    margin: 2rem 0 0.75rem;
+  }
+
+  .post-content :global(p) {
+    margin-bottom: 1.5rem;
+  }
+
+  .post-content :global(blockquote) {
+    border-left: 4px solid var(--color-accent);
+    padding-left: 1.5rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: var(--color-text-muted);
+  }
+
+  .post-content :global(code) {
+    background: var(--color-bg-secondary);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
+  .post-content :global(strong) {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .share-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
+  .share-link {
+    color: var(--color-accent);
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+
+  .share-link:hover {
+    opacity: 0.8;
+  }
+
+  .comments-section {
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+  }
+
+  .comments-section h2 {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  @media (max-width: 640px) {
+    .post {
+      padding: 2rem 1.5rem;
+    }
+
+    .post-image {
+      margin: 0 -1.5rem 2rem;
+      border-radius: 0;
+    }
+
+    .post-footer {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .comments-section {
+      padding: 0 1.5rem 4rem;
+    }
+  }
+</style>
+

@@ -1,0 +1,189 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PostCard from '@components/PostCard.astro';
+import { sanityClient, queries, type SanityPost } from '@lib/sanity';
+
+// Fetch posts at build time - this is what gives us great SEO!
+const allPosts = await sanityClient.fetch<SanityPost[]>(queries.allPosts);
+// Filter out posts without valid slugs
+const posts = (allPosts || []).filter(post => post?.slug?.current);
+---
+
+<BaseLayout title="With Risk - Home">
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        Stories that <span class="accent">matter</span>
+      </h1>
+      <p class="hero-subtitle">
+        Exploring ideas, sharing insights, and building something meaningful together.
+      </p>
+      <a href="/posts" class="cta-button">
+        Browse Posts
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+    <div class="hero-decoration"></div>
+  </section>
+
+  <section class="latest-posts">
+    <div class="section-header">
+      <h2>Latest Posts</h2>
+      <a href="/posts" class="view-all">View all →</a>
+    </div>
+
+    <div class="posts-grid">
+      {posts.slice(0, 6).map((post) => (
+        <PostCard post={post} />
+      ))}
+    </div>
+
+    {posts.length === 0 && (
+      <div class="empty-state">
+        <p>No posts yet. Create your first post in Sanity Studio!</p>
+      </div>
+    )}
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    padding: 6rem 2rem 8rem;
+    max-width: var(--container-width);
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+  }
+
+  .hero-title {
+    font-family: var(--font-serif);
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+  }
+
+  .accent {
+    color: var(--color-accent);
+    position: relative;
+  }
+
+  .accent::after {
+    content: '';
+    position: absolute;
+    bottom: 0.1em;
+    left: 0;
+    right: 0;
+    height: 0.15em;
+    background: var(--color-accent);
+    opacity: 0.3;
+    border-radius: 4px;
+  }
+
+  .hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+    max-width: 500px;
+    margin-bottom: 2.5rem;
+  }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-accent);
+    color: white;
+    padding: 0.875rem 1.75rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .cta-button:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-2px);
+  }
+
+  .hero-decoration {
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--color-accent) 0%, transparent 70%);
+    opacity: 0.1;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .latest-posts {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .section-header h2 {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-weight: 600;
+  }
+
+  .view-all {
+    color: var(--color-accent);
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+
+  .view-all:hover {
+    opacity: 0.8;
+  }
+
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--color-text-muted);
+    background: var(--color-bg-secondary);
+    border-radius: 12px;
+    border: 1px dashed var(--color-border);
+  }
+
+  @media (max-width: 640px) {
+    .hero {
+      padding: 4rem 1.5rem 6rem;
+    }
+
+    .posts-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+</style>
+
