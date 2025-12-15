@@ -1,0 +1,15 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Handle SPA-style routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["admin"]}
+
+# Environment variables (will be overridden by Netlify dashboard)
+[build.environment]
+  NODE_VERSION = "20"
+

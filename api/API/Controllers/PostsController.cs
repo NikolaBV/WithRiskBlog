@@ -13,18 +13,21 @@ public class PostsController : BaseApiController
         return HandleResult(await Mediator.Send(new GetStats.Query { PostSlug = postSlug }, ct));
     }
 
+    [AllowAnonymous]
     [HttpPost("{postSlug}/like")]
     public async Task<IActionResult> ToggleLike(string postSlug, CancellationToken ct)
     {
         return HandleResult(await Mediator.Send(new ToggleLike.Command { PostSlug = postSlug }, ct));
     }
 
+    [AllowAnonymous]
     [HttpDelete("{postSlug}/like")]
     public async Task<IActionResult> Unlike(string postSlug, CancellationToken ct)
     {
         return HandleResult(await Mediator.Send(new ToggleLike.Command { PostSlug = postSlug }, ct));
     }
 
+    [AllowAnonymous]
     [HttpPost("{postSlug}/view")]
     public async Task<IActionResult> RecordView(string postSlug, CancellationToken ct)
     {

@@ -13,6 +13,7 @@ public class CommentsController : BaseApiController
         return HandleResult(await Mediator.Send(new List.Query { PostSlug = postSlug }, ct));
     }
 
+    [AllowAnonymous]
     [HttpPost]
     public async Task<IActionResult> CreateComment(Create.Command command, CancellationToken ct)
     {
