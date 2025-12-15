@@ -20,13 +20,13 @@ public static class ApplicationServiceExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
 
-        // Database - SQLite for simple local development
+        // Database - PostgreSQL for production
         services.AddDbContext<DataContext>(opt =>
         {
-            opt.UseSqlite(config.GetConnectionString("DefaultConnection"));
+            opt.UseNpgsql(config.GetConnectionString("DefaultConnection"));
         });
 
-        // CORS - Allow Astro frontend
+        // CORS - Allow Astro frontend (local and production)
         services.AddCors(opt =>
         {
             opt.AddPolicy("CorsPolicy", policy =>
@@ -35,8 +35,9 @@ public static class ApplicationServiceExtensions
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .WithOrigins(
-                        "http://localhost:4321",  // Astro dev server
-                        "http://localhost:3000"   // Alternative port
+                        "http://localhost:4321",           // Astro dev server
+                        "http://localhost:3000",           // Alternative port
+                        "https://withrisk.netlify.app"     // Netlify production
                     );
             });
         });
