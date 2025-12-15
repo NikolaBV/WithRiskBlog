@@ -1,0 +1,33 @@
+# Ignore build outputs (will be regenerated)
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+# Ignore node_modules
+**/node_modules/
+
+# Ignore IDE files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Ignore git
+.git/
+.gitignore
+
+# Ignore databases
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Ignore frontend (not needed for API build)
+blog/
+studio-blog/
+
+# Ignore documentation
+*.md
+
