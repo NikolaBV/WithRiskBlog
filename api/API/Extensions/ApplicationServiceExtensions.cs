@@ -20,21 +20,29 @@ public static class ApplicationServiceExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
 
-        // Database - PostgreSQL for production
+        // Database - SQLite for development, PostgreSQL for production
         var connectionString = config.GetConnectionString("DefaultConnection");
-        
-        // Handle Railway's PostgreSQL URL format and add SSL
-        if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgresql://"))
-        {
-            // Convert URL format to Npgsql format
-            var uri = new Uri(connectionString);
-            var userInfo = uri.UserInfo.Split(':');
-            connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
-        }
         
         services.AddDbContext<DataContext>(opt =>
         {
-            opt.UseNpgsql(connectionString);
+            if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgresql://"))
+            {
+                // Production: PostgreSQL (Railway URL format)
+                var uri = new Uri(connectionString);
+                var userInfo = uri.UserInfo.Split(':');
+                var npgsqlConn = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+                opt.UseNpgsql(npgsqlConn);
+            }
+            else if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("Host="))
+            {
+                // PostgreSQL standard connection string format
+                opt.UseNpgsql(connectionString);
+            }
+            else
+            {
+                // Development: SQLite (default)
+                opt.UseSqlite(connectionString ?? "Data Source=Blog.db");
+            }
         });
 
         // CORS - Allow Astro frontend (local and production)
